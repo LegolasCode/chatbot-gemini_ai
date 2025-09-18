@@ -31,7 +31,7 @@ app.post((req, res) => {
   if (!body) {
     res.status(400).send("Tidak ada payload yang dikirim!");
   }
-
+  
   if (typeof body !== "object") {
     res.status(400).send("Payload harus berupa objek!");
   }
