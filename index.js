@@ -25,25 +25,47 @@ app.use(express.json()); // untuk membolehkan menggunakan JSON
 // inisiasi route
 // get(), .post(), .put(), .patch(), .delete()
 
-app.post((req, res) => {
+app.post('/generate-text', async(req, res) => {
   const { body } = req;
 
   if (!body) {
-    res.status(400).send("Tidak ada payload yang dikirim!");
+    res.status(400).json({ message: "Tidak ada payload yang dikirim!" });
+    return;
   }
   
   if (typeof body !== "object") {
-    res.status(400).send("Payload harus berupa objek!");
+    res.status(400).json({ message: "Payload harus berupa objek!" });
+    return;
   }
 
+  const { message } = body;
+
+  if (!message || typeof message !== "string") {
+    res.status(400).json({ message: "Pesan tidak ada atau formatnaya tidak sesuai!" });
+    return;
+  }
+  const response = await ai.models.generateContent({
+    contents: message,
+    model: geminiModel.text
+  });
+
+  res.status(200).json({
+    reply: response.text
+  });
 });
 
-async function main() {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: "Halo Dunia!",
-  });
-  console.log(response.text);
-}
+// async function main() {
+//   const response = await ai.models.generateContent({
+//     model: "gemini-2.5-flash",
+//     contents: "Halo Dunia!",
+//   });
+//   console.log(response.text);
+// }
 
-await main();
+// await main();
+
+const port = 3000;
+
+app.listen(port, () => {
+  console.log("I LOVE YOU", port);
+});
